@@ -23,6 +23,9 @@ class StartViewModel(application: Application): AndroidViewModel(application) {
     init {
         val journalDao = WatchmanDatabase.getInstance(application).getJournalDao()
         repository = JournalRepository(journalDao)
+/*        viewModelScope.launch(Dispatchers.IO) {
+            repository.clearTable()
+        }*/
     }
 
     fun getRecords(newList: Boolean) {
@@ -34,8 +37,9 @@ class StartViewModel(application: Application): AndroidViewModel(application) {
     fun setRecord(journal: Journal) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.setRecord(journal)
-            getRecords(false)
+            _myList.postValue(repository.getRecords(false))
         }
+        //getRecords(false)
     }
 
 }

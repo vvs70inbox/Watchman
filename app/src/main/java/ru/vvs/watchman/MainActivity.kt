@@ -1,19 +1,31 @@
 package ru.vvs.watchman
 
+import android.content.Context
 import android.content.SharedPreferences
+import android.icu.util.Calendar
 import android.nfc.FormatException
 import android.nfc.NfcAdapter
 import android.nfc.NfcAdapter.ReaderCallback
 import android.nfc.Tag
 import android.nfc.tech.Ndef
 import android.os.Bundle
+import android.util.AttributeSet
+import android.view.View
+import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import ru.vvs.watchman.databinding.ActivityMainBinding
+import ru.vvs.watchman.model.Journal
+import ru.vvs.watchman.screens.startfragment.StartViewModel
 import java.io.IOException
 import java.nio.charset.StandardCharsets
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 class MainActivity : AppCompatActivity(), ReaderCallback {
@@ -27,6 +39,12 @@ class MainActivity : AppCompatActivity(), ReaderCallback {
     lateinit var settings: SharedPreferences
 
     private var nfcAdapter: NfcAdapter? = null
+    private val formatter = SimpleDateFormat("yyyy-MM-dd hh-mm-ss", Locale.GERMANY)
+    private val formatterD = SimpleDateFormat("yyyy-MM-dd", Locale.GERMANY)
+    private val formatterH = SimpleDateFormat("hh-mm-ss", Locale.GERMANY)
+
+    //private val startFragment by viewModels<StartViewModel> { ViewModelProvider.AndroidViewModelFactory(application) }
+    lateinit var startFragment: StartViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,8 +56,10 @@ class MainActivity : AppCompatActivity(), ReaderCallback {
         actionBar = supportActionBar!!
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this)
-    }
 
+        startFragment = ViewModelProvider(this)[StartViewModel::class.java]
+
+    }
 
     public override fun onResume() {
         super.onResume()
@@ -74,16 +94,7 @@ class MainActivity : AppCompatActivity(), ReaderCallback {
                     val records = ndefMessage.records
                     val nfcData = String(records[0].payload, StandardCharsets.UTF_8)
 
-                    //viewModel.setRecord(Journal(0, Calendar.getInstance().time.toString(), nfcData, "Обход" ))
-
-/*                    runOnUiThread {
-                        // выводим информацию о метке
-                        val currentTime = Calendar.getInstance().getTime()
-
-                        val nfcInfoTv =
-                            findViewById<TextView>(R.id.nfc_info_tv)
-                        nfcInfoTv.text = nfcData
-                    }*/
+                    startFragment.setRecord(Journal(0, formatter.format(Calendar.getInstance().timeInMillis), nfcData, "Обход" ))
 
                 }
             } catch (e: IOException) {
