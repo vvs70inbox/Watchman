@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity(), ReaderCallback {
     lateinit var settings: SharedPreferences
 
     private var nfcAdapter: NfcAdapter? = null
-    private val formatter = SimpleDateFormat("yyyy-MM-dd hh-mm-ss", Locale.GERMANY)
+    private val formatter = SimpleDateFormat("yyyy-MM-dd HH-mm-ss", Locale.GERMANY)
     private val formatterD = SimpleDateFormat("yyyy-MM-dd", Locale.GERMANY)
     private val formatterH = SimpleDateFormat("hh-mm-ss", Locale.GERMANY)
 
